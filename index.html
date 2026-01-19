@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Brainify AI</title>
+
+  <!-- ✅ PWA -->
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#0b1220">
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #0b1222;
+      --header: #111c33;
+      --border: rgba(255,255,255,.12);
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+
+      --user1: #2563eb;
+      --user2: #1d4ed8;
+
+      --ai1: #1f2937;
+      --ai2: #111827;
+
+      --btn: #2563eb;
+      --btn2: #1d4ed8;
+      --danger: #ef4444;
+    } 
+
+    *{ box-sizing:border-box; }
+    /* === INPUT ZONA ALBA === */
+.input-area {
+  background: #ffffff;
+  border-top: 1px solid #ddd;
+}
+
+textarea,
+input {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 15px;
+  outline: none;
+}
+
+textarea::placeholder {
+  color: #666;
+}
+
+/* mesaje user */
+.bubble.user {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #ddd;
+} 
+    body{
+      margin:0;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 70% 20%, rgba(59,130,246,.18), transparent 55%),
+                  radial-gradient(900px 500px at 20% 70%, rgba(16,185,129,.10), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+
+      /* center app */
+      display:flex;
+      justify-content:center;
+      min-height:100vh;
+      padding:16px;
+      box-sizing: border-box;
+    }
+
+   .app-container{
+  width:360px;
+  max-width:95vw;
+  height:620px;
+  max-height:90vh;
+  display:flex;
+  flex-direction:column;
+  border:1px solid var(--border);
+  border-radius:18px;
+  overflow:hidden;
+  background: rgba(11,18,34,.75);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+
+/* ===== COMPOSER (zona de jos) ===== */
+.composer{
+  border-top:1px solid var(--border);
+  background: rgba(11,18,34,.85);
+  padding:12px;
+
+  display:flex;
+  flex-direction:column;   /* 🔥 butoanele sus */
+  gap:10px;
+}
+
+.composer-actions{
+  display:flex;
+  gap:8px;
+  justify-content:space-between;
+}
+
+#input{
+  width:100%;
+}
+
+/* ================================ */
+
+header{
+  padding:14px 16px;
+  background: linear-gradient(180deg,
+    rgba(17,28,51,.95),
+    rgba(17,28,51,.85)
+  );
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+
+    .logo{
+      width:30px; height:30px;
+      border-radius:8px;
+      display:flex; align-items:center;
+      justify-content: center;
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
+    
+    }
+    .logo img{
+      width: 40px;
+      height: 40px;
+    object-fit:contain;
+    }
+
+    .title-wrap{ display:flex; flex-direction:column; gap:2px; }
+    .title{ font-weight:700; }
+    .subtitle{ font-size:12px; color:var(--muted); }
+
+    /* chat area */
+  #chat{
+  flex: 1;
+  padding: 18px 18px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+
+  /* 🔥 ALINIERE PERFECTĂ */
+  max-width: 420px;
+  margin: 0 auto;
+} 
+
+
+/* message bubbles */
+.row {
+  display: flex;
+  margin: 10px 0;
+  gap: 10px;
+}
+
+.row.user { justify-content: flex-end; }
+.row.ai   { justify-content: flex-start; }
+
+.bubble {
+  max-width:85%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  line-height: 1.4;
+  font-size: 15px;
+  word-wrap: break-word;
+}
+:root{
+  --content-w: 420px;  /* lățimea “telefon” */
+}
+
+/* același “cadru” pentru mesaje + zona de input */
+#chat,
+.composer{
+  width: 95%;
+  max-width: var(--content-w);
+  margin-left: auto;
+  margin-right: auto;
+} 
+
+.bubble.user {
+  background: #2563eb;
+  color: white;
+}
+
+.bubble.ai {
+  background: white;
+  color: black;
+} 
+
+    /* composer (sticky bottom) */
+   #input{
+  width:100px%;
+  min-height:120px;        /* 🔽 mult mai mic */
+  max-height:150px;       /* crește doar dacă scrii mult */
+  resize:none;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.06);
+  color:var(--text);
+  font-size:15px;
+  line-height:1.4;
+  outline:none;
+  overflow-y:auto;
+  transition: height .15s ease;
+}
+    textarea::placeholder{ color: rgba(148,163,184,.85); }
+/* ===== MODERN HEADER ===== */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 16px;
+  margin-bottom: 10px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(80,120,255,0.18),
+    rgba(0,0,0,0.25)
+  );
+
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 700;
+  font-size: 18px;
+
+  background: linear-gradient(135deg,#4f8cff,#6dd5ff);
+  color: #fff;
+}
+
+.titles {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #3cff6b;
+  box-shadow: 0 0 6px #3cff6b;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.iconbtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+
+  border: none;
+  cursor: pointer;
+
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font-size: 16px;
+
+  transition: 0.2s;
+}
+
+.iconbtn:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+    button{
+      cursor:pointer;
+      border:none;
+      border-radius:7px;
+      padding:6px 10px;
+      font-weight:500;
+      color:white;
+      background: linear-gradient(135deg, var(--btn), var(--btn2));
+      box-shadow: 0 10px 20px rgba(37,99,235,.22);
+      min-width:88px;
+    }
+
+    button:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+    }
+
+    .hint{
+      padding:10px 12px 12px;
+      font-size:12px;
+      color:var(--muted);
+      border-top:1px solid rgba(255,255,255,.06);
+    }
+
+    /* mobile tweaks */
+    @media (max-width: 520px){
+      body{ padding:10px; }
+      .app-container{ border-radius:14px; }
+      #chat{ height: calc(100vh - 155px); min-height: 380px; }
+      .bubble{ max-width: 92%; }
+      button{ min-width:78px; padding:12px 12px; }
+    }
+
+/* =========================
+   CHAT DESIGN UPGRADE
+   ========================= */
+
+#chat {
+  padding: 14px;
+  background: linear-gradient(180deg, #f8fafc, #eef2ff);
+}
+
+.bubble {
+  padding: 12px 14px;
+  border-radius: 16px;
+  margin: 8px 0;
+  line-height: 1.5;
+  font-size: 15px;
+  animation: fadeIn 0.25s ease;
+}
+
+.bubble.user {
+  background: #2563eb;
+  color: #fff;
+  margin-left: auto;
+  border-bottom-right-radius: 6px;
+}
+
+.bubble.ai {
+  background: #ffffff;
+  color: #111;
+  margin-right: auto;
+  border-bottom-left-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+} 
+  </style>
+</head>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0b1020">
+
+<body>
+  <div class="app-container">
+    <header class="topbar">
+  <div class="brand">
+
+    
+    <div class="logo">
+      <img src="assets/logo2.png"
+      alt="Brainify Logo">
+    </div>
+
+    <div class="titles">
+      <div class="title">Brainify AI</div>
+<div class="header-right">
+  <div id="statusPill" class="status-pill">
+    <span id="statusDot" class="dot ready"></span>
+    <span id="statusText">Ready</span>
+    <span id="statusSpinner" class="spinner" style="display:none;"></span>
+  </div>
+</div>
+
+
+
+      <div class="status" id="statusDot">
+        <span class="dot"></span>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="iconbtn" id="themeBtn" title="Theme">☾</button>
+  </div>
+</header>
+
+
+    <div id="chat"></div>
+
+   <div class="composer">
+  <div class="composer-actions">
+    <button id="askBtn" onclick="ask()">Ask</button>
+    <button id="micBtn" type="button">🎤</button>
+    <button id="clearBtn" onclick="clearChat()">Clear</button>
+  </div>
+
+  <textarea id="input" placeholder="Type your message... (Enter = send, Shift+Enter = new line)"></textarea>
+</div>
+
+
+  <script>
+
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("input");
+    const askBtn = document.getElementById("askBtn");
+    // ===== GREETING =====
+window.addEventListener("load", () => {
+  addMessage("ai", " 👋I`m Brainify AI. How can i help you today?");
+  input.focus();
+}); 
+
+// ===== Voice reply state (TTS) =====
+let lastInputWasVoice = false;
+let lastVoiceLang = navigator.language || "ro-RO";
+
+let voicesCache = [];
+function loadVoices() {
+  voicesCache = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+}
+if ("speechSynthesis" in window) {
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+// detect language from text
+function detectLang(text) {
+  const t = (text || "").toLowerCase();
+
+  const ro = ["ă","â","î","ș","ț","vreau","te rog","cum","unde","când"];
+  const de = ["ich","du","und","nicht","bitte","was","wie","danke"];
+  const en = ["the","and","what","how","where","please","thanks"];
+
+  const score = arr => arr.filter(w => t.includes(w)).length;
+
+  const sRO = score(ro);
+  const sDE = score(de);
+  const sEN = score(en);
+
+  if (sDE > sRO && sDE > sEN) return "de-DE";
+  if (sEN > sRO && sEN > sDE) return "en-US";
+  return "ro-RO";
+}
+
+// speak answer
+function speak(text, lang) {
+  if (!window.speechSynthesis) {
+    console.warn("Speech synthesis not supported");
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = lang || navigator.language || "en-US";
+  utter.rate = 1;
+  utter.pitch = 1;
+  utter.volume = 1;
+
+  window.speechSynthesis.speak(utter);
+}
+
+    // ===== Auto-grow textarea =====
+function autoGrow() {
+  input.style.height = "auto";
+  input.style.height = Math.min(input.scrollHeight, 140) + "px";
+}
+
+input.addEventListener("input", autoGrow);
+
+
+    function clearChat() {
+  chat.innerHTML = "";
+  localStorage.removeItem("brainiac_chat");
+}
+
+
+    function scrollToBottom(){
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function addMessage(role, text){
+      const row = document.createElement("div");
+      row.className = "row " + (role === "user" ? "user" : "ai");
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble " + (role === "user" ? "user" : "ai");
+      bubble.textContent = text;
+
+      row.appendChild(bubble);
+      chat.appendChild(row);
+      scrollToBottom();
+      return bubble;
+    }
+
+    function setBusy(isBusy){
+      askBtn.disabled = isBusy;
+      input.disabled = isBusy;
+      askBtn.textContent = isBusy ? "..." : "Ask";
+    }
+
+    // Enter = send, Shift+Enter = newline
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey){
+        e.preventDefault();
+        ask();
+      }
+    });
+const REQUEST_TIMEOUT_MS = 30000;
+
+function fetchWithTimeout(url, options = {}, timeout = REQUEST_TIMEOUT_MS) {
+  const controller =new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+
+  return fetch(url, { ...options, signal: controller.signal })
+    .finally(() => clearTimeout(id));
+}
+
+const target = ((lastVoiceLang || navigator.language || "en-US") + "").toLowerCase();
+const base = target.split("-")[0]; 
+function pickVoiceForLang(lang) {
+  if (!("speechSynthesis" in window)) return null;
+  if (!voicesCache.length) loadVoices();
+
+const target = ((lastVoiceLang || navigator.language || "en-US") + "").toLowerCase();
+const base = target.split("-")[0]; 
+  let v = voicesCache.find(x =>
+    (x.lang || "").toLowerCase() === target
+  );
+  if (v) return v;
+
+  v = voicesCache.find(x =>
+    (x.lang || "").toLowerCase().startsWith(base)
+  );
+  if (v) return v;
+
+  return voicesCache[0] || null;
+} 
+
+function speakAI(text, lang) {
+  if (!("speechSynthesis" in window)) return;
+  if (!text) return;
+
+  speechSynthesis.cancel();
+
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = lang || navigator.language || "en-US";
+  utter.rate = 1;
+  utter.pitch = 1;
+  utter.volume = 1;
+
+  speechSynthesis.speak(utter);
+}
+
+async function ask() {
+  const question = input.value.trim();
+  if (!question) return;
+
+  input.value = "";
+  addMessage("user", question);
+  setBusy(true);
+
+  const typingBubble = addMessage("ai", "Typing...");
+
+  try {
+    const response = await fetchWithTimeout("/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question }),
+    });
+
+    const data = await response.json();
+    const answer = (data && data.answer) ? String(data.answer) : "No answer";
+
+    typingBubble.textContent = answer;
+
+    if (lastInputWasVoice) {
+      speakAI(answer, lastVoiceLang);
+      lastInputWasVoice = false;
+    }
+  } catch (err) {
+    typingBubble.textContent = "Server not responding.";
+    console.error(err);
+  } finally {
+    setBusy(false);
+    input.focus();
+  }
+}
+
+
+// ===== Voice Input =====
+const micBtn = document.getElementById("micBtn");
+
+const SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognition && micBtn) {
+  const recognition = new SpeechRecognition();
+
+  recognition.lang = navigator.language || "ro-RO";
+  recognition.interimResults = false;
+  recognition.continuous = false;
+
+  let isListening = false;
+
+  function setMicUI(listening) {
+    micBtn.textContent = listening ? "⏹️" : "🎤";
+  }
+
+  micBtn.onclick = () => {
+    if (isListening) {
+      recognition.stop();
+      return;
+    }
+
+    try {
+      recognition.lang = navigator.language || "ro-RO";
+      isListening = true;
+      setMicUI(true);
+      recognition.start();
+    } catch (e) {
+      console.error("Mic start error:", e);
+      isListening = false;
+      setMicUI(false);
+    }
+  };
+
+  recognition.onresult = (event) => {
+    const text = event.results?.[0]?.[0]?.transcript || "";
+    if (!text) return;
+
+    lastVoiceLang = recognition.lang || navigator.language || "ro-RO";
+    lastInputWasVoice = true;
+
+    input.value = text;
+    autoGrow();
+    ask();
+  };
+
+  recognition.onerror = (event) => {
+    console.error("SpeechRecognition error:", event?.error || event);
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    setMicUI(false);
+  };
+} else {
+  if (micBtn) micBtn.style.display = "none";
+} 
+// ===== PWA Service Worker =====
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/service-worker.js")
+      .then(() => console.log("✅ Service Worker registered"))
+      .catch(err => console.error("❌ SW error:", err));
+  });
+} 
+
+  </script>
+</body>
+</html>
