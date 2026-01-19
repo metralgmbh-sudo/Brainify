@@ -383,12 +383,94 @@ header{
   from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: translateY(0); }
 } 
+/* ===== ACCESS CODE GATE ===== */
+
+.gate {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 15, 25, 0.95);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.gate.show {
+  display: flex;
+}
+
+.gate-card {
+  width: 90%;
+  max-width: 360px;
+  background: #0b1222;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  animation: fadeIn .25s ease;
+}
+
+.gate-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #fff;
+}
+
+.gate-sub {
+  font-size: 14px;
+  color: #94a3b8;
+  margin-bottom: 18px;
+}
+
+.gate-input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: #111827;
+  color: #fff;
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.gate-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.gate-msg {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #f87171;
+} 
+
   </style>
 </head>
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#0b1020">
 
 <body>
+
+  <!-- 🔐 Access Code Gate (Pasul A) -->
+<div id="codeGate" class="gate">
+  <div class="gate-card">
+    <div class="gate-title">Brainify Test Access</div>
+    <div class="gate-sub">Enter your test code to continue.</div>
+
+    <input id="codeInput" class="gate-input" type="text" placeholder="e.g. BF-TEST-001" autocomplete="off" />
+
+    <button id="codeBtn" class="gate-btn">Continue</button>
+
+    <div id="codeMsg" class="gate-msg"></div>
+  </div>
+</div> 
   <div class="app-container">
     <header class="topbar">
   <div class="brand">
@@ -692,7 +774,98 @@ if ("serviceWorker" in navigator) {
       .catch(err => console.error("❌ SW error:", err));
   });
 } 
+// 🔐 Access Code Gate (Pasul A)
+const codeGate = document.getElementById("codeGate");
+const codeInput = document.getElementById("codeInput");
+const codeBtn = document.getElementById("codeBtn");
+const codeMsg = document.getElementById("codeMsg");
 
+function showGate() {
+  if (codeGate) codeGate.classList.add("show");
+  if (codeInput) setTimeout(() => codeInput.focus(), 50);
+}
+
+function hideGate() {
+  if (codeGate) codeGate.classList.remove("show");
+}
+
+function getSavedCode() {
+  return localStorage.getItem("BRAINIFY_TEST_CODE") || "";
+}
+// ✅ PASUL B1: coduri valide (hard-coded)
+// 🔒 Beta master switch
+const BETA_OPEN = true; 
+const VALID_TEST_CODES = new Set([
+  "BF-TEST-001",
+  "BF-TEST-002",
+  "BF-TEST-003",
+  "BF-TEST-004",
+  "BF-TEST-005",
+  "BF-TEST-006",
+  "BF-TEST-007",
+  "BF-TEST-008",
+  "BF-TEST-009",
+  "BF-TEST-0010",
+  "BF-TEST-0011",
+  "BF-TEST-0012",
+  "BF-TEST-0013",
+  "BF-TEST-0014",
+  "BF-TEST-0015",
+  "BF-TEST-0016",
+  "BF-TEST-0017",
+  "BF-TEST-0018",
+  "BF-TEST-0019",
+  "BF-TEST-0020",
+]);
+
+// ✅ dacă vrei să oprești complet testul:
+// const BETA_OPEN = false;  // => nimeni nu intră
+function saveCode(code) {
+  localStorage.setItem("BRAINIFY_TEST_CODE", code);
+}
+
+function clearCode() {
+  localStorage.removeItem("BRAINIFY_TEST_CODE");
+}
+
+// La încărcare: dacă nu există cod -> arată gate
+window.addEventListener("load", () => {
+  const saved = getSavedCode();
+  if (!saved) showGate();
+});
+
+// Continue button
+codeBtn.addEventListener("click", () => {
+  const code = (codeInput?.value || "").trim();
+
+  if (!BETA_OPEN) {
+    if (codeMsg) codeMsg.innerText = "Test is closed right now.";
+    return;
+  }
+
+  if (!code) {
+    if (codeMsg) codeMsg.innerText = "Please enter a code.";
+    return;
+  }
+
+  const normalized = code.toUpperCase();
+
+  if (!VALID_TEST_CODES.has(normalized)) {
+    if (codeMsg) codeMsg.innerText = "Invalid code. Please try again.";
+    return;
+  }
+
+  saveCode(normalized);
+  if (codeMsg) codeMsg.innerText = "";
+  hideGate();
+}); 
+
+// Enter key in input
+if (codeInput) {
+  codeInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") codeBtn?.click();
+  });
+}
   </script>
 </body>
 </html>

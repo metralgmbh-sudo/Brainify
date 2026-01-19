@@ -19,6 +19,9 @@ const __dirname = path.dirname(__filename);
 // If your index.html is in same folder, keep this.
 // If it's in /public, change to: path.join(__dirname, "public")
 app.use(express.static(__dirname));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+}); 
 
 // ---- Config ----
 const PORT = process.env.PORT || 3000;
@@ -166,7 +169,12 @@ app.post("/ask", async (req, res) => {
     memoryStore.set(clientKey, memory);
 
     // Call AI
-    const answer = await callOpenAI(memory);
+   const messages = [
+  { role: "system", content: BASE_SYSTEM_PROMPT },
+  ...memory,
+];
+
+const answer = await callOpenAI(messages); 
 
     // Save assistant answer
     memory.push({ role: "assistant", content: answer });
