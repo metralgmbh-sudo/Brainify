@@ -454,9 +454,24 @@ header{
   margin-top: 10px;
   font-size: 13px;
   color: #f87171;
-} 
+}
 
-  </style>
+/* ===== FIX ANDROID WEBVIEW SAFE AREA ===== */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.app-container {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: border-box;
+}
+
+</style> 
 </head>
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#0b1020">
